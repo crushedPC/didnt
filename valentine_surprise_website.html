@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Will You Be My Valentine? ❤️</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #333;
+    }
+    .card {
+      background: white;
+      width: 90%;
+      max-width: 420px;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+    h1 { margin-bottom: 20px; font-size: 1.6rem; }
+    p { margin-bottom: 25px; font-size: 1.1rem; }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 25px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .yes { background: #ff4d6d; color: white; }
+    .yes:hover { transform: scale(1.05); }
+    .no { background: #ddd; position: relative; }
+    .hidden { display: none; }
+
+    .music-control {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border-radius: 20px;
+      padding: 8px 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+    .music-control button {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      border-radius: 15px;
+      background: #ff4d6d;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" loop></audio>
+
+  <div class="music-control">
+    <span>🎵 Music</span>
+    <button onclick="toggleMusic()">Play / Pause</button>
+    <button onclick="nextSong()">Next ▶</button>
+  </div>
+
+  <!-- Page 1 -->
+  <div class="card" id="page1">
+    <h1>Will you be my Valentine? 💖</h1>
+    <p>I have a very important question for you…</p>
+    <div class="buttons">
+      <button class="yes" onclick="sayYes()">Yes 💕</button>
+      <button class="no" id="noBtn">No 🙃</button>
+    </div>
+  </div>
+
+  <!-- Page 2 -->
+  <div class="card hidden" id="page2">
+    <h1>Hehe 😌</h1>
+    <p><strong>Mujhe toh pata hi tha.</strong></p>
+    <button class="yes" onclick="goNext()">Go Next ➜</button>
+  </div>
+
+  <!-- Page 3 -->
+  <div class="card hidden" id="page3">
+    <h1>So… what do you choose? 💫</h1>
+    <div class="buttons" style="flex-direction: column; gap:15px;">
+      <button class="yes" onclick="endPage()">Spend time with me (bonus: cuddles 🤗)</button>
+      <button class="yes" onclick="endPage()">Go out on a date 🌹</button>
+    </div>
+  </div>
+
+  <!-- Page 4 -->
+  <div class="card hidden" id="page4">
+    <h1>Yayyy! 💕</h1>
+    <p>No matter what you chose…<br/>I just want you. ❤️</p>
+    <p>Happy Valentine’s (in advance) ✨</p>
+  </div>
+
+  <script>
+    /* ---------------- MUSIC ---------------- */
+    const playlist = [
+      'music/Dooba_spotdown.org.mp3',
+      'music/Mrignaini_spotdown.org.mp3',
+      'music/Naazni - Aashir Wajahat  Annural Khalid  Prod By. Abdullah Siddiqui (Music Video) - Aashir Wajahat (youtube).mp3',
+      'music/Neelay_spotdown.org.mp3',
+      'music/Rakhlo Tum Chupaake_spotdown.org.mp3',
+      'music/Sawaal_spotdown.org.mp3'
+    ];
+
+    const bgMusic = document.getElementById('bgMusic');
+    let currentSong = Math.floor(Math.random() * playlist.length);
+
+    function loadSong(index) {
+      bgMusic.src = playlist[index];
+      bgMusic.load();
+    }
+
+    function nextSong() {
+      currentSong = (currentSong + 1) % playlist.length;
+      loadSong(currentSong);
+      bgMusic.play().catch(() => {});
+    }
+
+    function toggleMusic() {
+      if (bgMusic.paused) bgMusic.play().catch(() => {});
+      else bgMusic.pause();
+    }
+
+    window.addEventListener('load', () => {
+      loadSong(currentSong);
+    });
+
+    /* ---------------- PAGE FLOW ---------------- */
+    function sayYes() {
+      document.getElementById('page1').classList.add('hidden');
+      document.getElementById('page2').classList.remove('hidden');
+    }
+
+    function goNext() {
+      document.getElementById('page2').classList.add('hidden');
+      document.getElementById('page3').classList.remove('hidden');
+    }
+
+    function endPage() {
+      document.getElementById('page3').classList.add('hidden');
+      document.getElementById('page4').classList.remove('hidden');
+    }
+
+    /* ---------------- NO BUTTON EVADE LOGIC ---------------- */
+    const noBtn = document.getElementById('noBtn');
+    const evadeDistance = 80;
+
+    document.addEventListener('mousemove', (e) => {
+      const rect = noBtn.getBoundingClientRect();
+      const dx = e.clientX - (rect.left + rect.width / 2);
+      const dy = e.clientY - (rect.top + rect.height / 2);
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < evadeDistance) {
+        const angle = Math.atan2(dy, dx);
+        const moveX = Math.cos(angle) * 120;
+        const moveY = Math.sin(angle) * 120;
+        noBtn.style.transform = `translate(${-moveX}px, ${-moveY}px)`;
+      }
+    });
+
+    /* ---------------- BASIC TESTS ---------------- */
+    console.assert(typeof sayYes === 'function', 'sayYes should exist');
+    console.assert(typeof toggleMusic === 'function', 'toggleMusic should exist');
+  </script>
+
+</body>
+</html>
